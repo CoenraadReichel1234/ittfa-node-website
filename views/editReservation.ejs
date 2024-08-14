@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Reservation</title>
+    <style>
+      body {
+        background-image: linear-gradient(to bottom right, #08146d, #b81b1b, #e74c3c, #841b1b, #cf2222);
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+      header {
+        background-color: #333;
+        padding: 20px;
+        text-align: center;
+      }
+    
+      nav {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+    
+      .menu {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    
+      .menu-next {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 10px;
+      }
+    
+      .topBar {
+        background-color: #444;
+        padding: 10px;
+        border-radius: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    
+      .topBar a {
+        color: #fff;
+        text-decoration: none;
+        margin: 0 10px;
+        transition: none;
+      }
+    
+      .topBar a:hover {
+        color: #ccc;
+        border-radius: 5px;
+        border: 1px solid #33CC33;
+        padding: 5px;
+        background-color: #444;
+        box-shadow: 0 0 10px #33CC33;
+      }
+    
+      #view-profile-link {
+        margin-left: 20px;
+      }
+
+      #edit-reservation-form {
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        box-shadow: 0 0 10px #ccc;
+      }
+      
+      #edit-reservation-form label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+      
+      #edit-reservation-form input, #edit-reservation-form select {
+        width: 100%;
+        padding: 10px;
+        margin:0 0 20px -10px;
+        border: 1px solid #ccc;
+        font-size: 18px;
+        height: 40px; 
+      }
+      
+      #edit-reservation-form button[type="submit"] {
+        background-color: #4CAF50;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      
+      #edit-reservation-form button[type="submit"]:hover {
+        background-color: #3e8e41;
+      }
+  
+      @media only screen and (max-width: 768px) {
+        .topBar {
+          flex-direction: column;
+        }
+        .topBar a {
+          margin: 10px 0;
+        }
+      }
+    </style>
+</head>
+<body>
+    <div id="header"></div>
+    <script>
+      fetch('/userHeader')
+          .then(response => response.text())
+          .then(html => {
+            document.getElementById('header').innerHTML = html;
+            })
+            .catch(error => {
+            console.error('Error fetching header:', error);
+            });
+    </script>
+    <form id="edit-reservation-form">
+        <label for="rentalPeriodStart">Rental Period Start:</label>
+        <input type="date" id="rental_period_start" name="rental_period_start" value="<%= reservation.rental_period_start ? reservation.rental_period_start : '' %>" required>
+      
+        <label for="rentalPeriodEnd">Rental Period End:</label>
+        <input type="date" id="rental_period_end" name="rental_period_end" value="<%= reservation.rental_period_end ? reservation.rental_period_end : '' %>" required>
+      
+        <label for="additionalServices">Additional Services:</label>
+        <input type="text" id="additional_services" name="additional_services" value="<%= reservation.additional_services ? reservation.additional_services : '' %>" required>
+      
+        <label for="vehicleId">Vehicle:</label>
+        <select id="vehicle_id" name="vehicle_id">
+            <% vehicles.forEach(vehicle => { %>
+              <option value="<%= vehicle.id %>" <%= (reservation && reservation.vehicle_id) === vehicle.id ? 'selected' : '' %>>&lt;&nbsp;<%= vehicle.make %>&nbsp;<%= vehicle.model %>&nbsp;(<%= vehicle.pricePerDay %>)&gt;</option>
+            <% }); %>
+          </select>
+
+          <select id="payment_method" name="payment_method">
+            <option value="1" <%= reservation.payment_method === '1' ? 'selected' : '' %>>EFT</option>
+            <option value="0" <%= reservation.payment_method === '0' ? 'selected' : '' %>>In Store</option>
+          </select>
+      
+        
+        <input type="hidden" id="pricePerDay" name="pricePerDay" value="<% const selectedVehicle = vehicles.find(vehicle => vehicle.id === reservation.vehicle_id); if (selectedVehicle) { %> <%= selectedVehicle.pricePerDay %> <% } else { %> 0 <% } %>">
+        <input type="hidden" id="reference_code" name="reference_code" value="<% reservation.reference_code %>">
+        <input type="hidden" id="reservation-id" value="<%= reservation.id %>">
+        <input type="hidden" id="userId" value="<%= userId %>">
+      
+        <button type="submit">Update Reservation</button>
+    </form>
+    
+    <script>
+        const vehiclesJSON = decodeURIComponent('<%= encodeURIComponent(JSON.stringify(vehicles)) %>');
+        const vehicles = JSON.parse(vehiclesJSON);
+      </script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const form = document.getElementById('edit-reservation-form');
+          const reservationId = document.getElementById('reservation-id').value;
+          const vehicleSelect = document.getElementById('vehicle_id');
+          const pricePerDayInput = document.getElementById('pricePerDay');
+          const reference_code = document.getElementById('reference_code');
+
+          // Update pricePerDay input field when vehicle_id select field changes
+          vehicleSelect.addEventListener('change', () => {
+            const selectedVehicleId = vehicleSelect.value;
+            const selectedVehicle = vehicles.find(vehicle => vehicle.id === parseInt(selectedVehicleId));
+            if (selectedVehicle) {
+              pricePerDayInput.value = selectedVehicle.pricePerDay;
+            }
+          });
+
+          form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const vehicle_id = document.getElementById('vehicle_id').options[document.getElementById('vehicle_id').selectedIndex].value;
+            if (!vehicle_id || isNaN(Number(vehicle_id))) {
+              console.error('Invalid vehicle_id:', vehicle_id);
+              //console.log('ID:', vehicle_id);
+              alert('Please select a valid vehicle.');
+              return;
+            }
+            const reservationData = {
+              userId: Number(document.getElementById('userId').value),
+              vehicle_id: Number(vehicle_id),
+              rental_period_start: document.getElementById('rental_period_start').value,
+              rental_period_end: document.getElementById('rental_period_end').value,
+              additional_services: document.getElementById('additional_services').value,
+              pricePerDay: Number(document.getElementById('pricePerDay').value),
+              payment_method: document.getElementById('payment_method').value,
+              reference_code: document.getElementById('reference_code').value,
+            };
+            try {
+              const response = await fetch(`/api/reservations/edit/${reservationId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reservationData)
+              });
+              if (response.ok) {
+                
+                alert("Reservation Updated Successfully!!!");
+                window.location.href = '/resHist';
+              } else {
+                console.error(`Error updating reservation: ${response.status}`);
+              }
+            } catch (error) {
+              console.error('Error updating reservation:', error);
+            }
+          });
+        });
+      </script>
+      
+</body>
+</html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Reservation History</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      body{
+        background-image: url('./pictures/UserHome.jpg');
+        font-family: Arial, sans-serif;
+      }
+      header {
+        background-color: #333;
+        padding: 20px;
+        text-align: center;
+      }
+    
+      nav {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+    
+      .menu {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    
+      .menu-next {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 10px;
+      }
+    
+      .topBar {
+        background-color: #444;
+        padding: 10px;
+        border-radius: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    
+      .topBar a {
+        color: #fff;
+        text-decoration: none;
+        margin: 0 10px;
+        transition: none;
+      }
+    
+      .topBar a:hover {
+        color: #ccc;
+        border-radius: 5px;
+        border: 1px solid #33CC33;
+        padding: 5px;
+        background-color: #444;
+        box-shadow: 0 0 10px #33CC33;
+      }
+    
+      #view-profile-link {
+        margin-left: 20px;
+      }
+
+      #reservations-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 40px auto;
+      }
+      
+      #reservations-table th, #reservations-table td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+      }
+      
+      #reservations-table th {
+        background-color: #132b83;
+        color: #fff;
+      }
+      
+      #reservations-table tr {
+        background-color: #f9f9f9;
+      }
+      
+      #reservations-table tr:hover {
+        background-color: #075c0d;
+        color: #fff;
+      }
+      
+      .actions {
+        text-align: center;
+      }
+      
+      .actions button {
+        margin: 0 10px;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #33CC33;
+      }
+      
+      .actions button:hover {
+        background-color: #33CC33;
+        color: #fff;
+      }
+
+      .actions a {
+        background-color: #4CAF50;
+        color: #fff;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      
+      .actions a:hover {
+        background-color: #3e8e41;
+      }
+  
+      @media only screen and (max-width: 768px) {
+        .topBar {
+          flex-direction: column;
+        }
+        .topBar a {
+          margin: 10px 0;
+        }
+      }
+    </style>
+</head>
+<body>
+    <div id="header"></div>
+    <script>
+      fetch('/userHeader')
+          .then(response => response.text())
+          .then(html => {
+          document.getElementById('header').innerHTML = html;
+          })
+          .catch(error => {
+          console.error('Error fetching header:', error);
+          });
+    </script>
+    
+    <table border="1" id="reservations-table">
+      <tr>
+        <th>Vehicle Type</th>
+        <th>Vehicle Make</th>
+        <th>Vehicle Model</th>
+        <th>Rent period start</th>
+        <th>Rent period end</th>
+        <th>License Plate Number</th>
+        <th>Price Per Day</th>
+        <th>Total Days</th>
+        <th>Total Rent Due</th>
+        <th>Payment Method</th>
+        <th>Reference Code</th>
+        <th>Actions</th>
+      </tr>
+    </table>
+
+    <script>
+        fetch('/api/reservations/viewHist')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Error fetching reservations');
+    }
+    return response.text();
+  })
+  .then(text => {
+    if (!text) {
+      console.error('No reservations found');
+      return;
+    }
+    const reservations = JSON.parse(text);
+    const tableBody = document.getElementById('reservations-table').getElementsByTagName('tbody')[0] || document.getElementById('reservations-table');
+    const today = new Date();
+    reservations.forEach(reservation => {
+      const startDate = new Date(reservation.rental_period_start);
+      const endDate = new Date(reservation.rental_period_end);
+      
+      const formattedStartDate = `${startDate.getFullYear()}-${startDate.getMonth() + 1}-${startDate.getDate()}`;
+      const formattedEndDate = `${endDate.getFullYear()}-${endDate.getMonth() + 1}-${endDate.getDate()}`;
+      
+      const row = tableBody.insertRow();
+      let actions = '';
+      if (today.getTime() < startDate.getTime() - 2 * 24 * 60 * 60 * 1000) {
+        actions = `<td class="actions"><a href="/api/reservations/edit/${reservation.id}" >Edit</a> | <button onclick="deleteReservation(${reservation.id})">Delete</button></td>`;
+      } else {
+        actions = `<td>Not editable</td>`;
+      }
+      
+      row.innerHTML = `
+        <td>${reservation.type}</td>
+        <td>${reservation.make}</td>
+        <td>${reservation.model}</td>
+        <td>${formattedStartDate}</td>
+        <td>${formattedEndDate}</td>
+        <td>${reservation.license_plate_number}</td>
+        <td>R ${reservation.pricePerDay}</td>
+        <td>${getTotalDays(reservation.rental_period_start, reservation.rental_period_end)}</td>
+        <td>R ${getTotalRentDue(reservation.pricePerDay, getTotalDays(reservation.rental_period_start, reservation.rental_period_end))}</td>
+        <td>${reservation.payment_method == '1' ? 'EFT' : 'In Store'}</td>
+        <td>${reservation.reference_code}</td>
+        ${actions}
+      `;
+    });
+  })
+  .catch(error => {
+    console.error('Error fetching reservations:', error);
+  });
+    </script>
+    <script>
+      
+      function getTotalDays(startDate, endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        return Math.round((end - start) / (1000 * 60 * 60 * 24));
+      }
+      
+      function getTotalRentDue(pricePerDay, totalDays) {
+        return pricePerDay * totalDays;
+      }
+      
+      function deleteReservation(id) {
+        if (confirm("Are you sure you want to delete this reservation?")) {
+          fetch(`/api/reservations/${id}`, {
+            method: 'DELETE'
+          })
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Error deleting reservation');
+              alert("Error when deleting");
+            }
+            return response.text();
+          })
+          .then(text => {
+            //console.log(text);
+            alert("Reservation Deleted!!");
+            location.reload();
+          })
+          .catch(error => {
+            console.error('Error deleting reservation:', error);
+          });
+        }
+      }
+    </script>
+</body>
+</html>

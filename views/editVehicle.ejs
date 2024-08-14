@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Vehicle</title>
+    <style>
+      body {
+        background-image: linear-gradient(to bottom right, #08146d, #b81b1b, #e74c3c, #841b1b, #cf2222);
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+      header {
+        background-color: #333;
+        padding: 20px;
+        text-align: center;
+      }
+    
+      nav {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+    
+      .menu {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    
+      .menu-next {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 10px;
+      }
+    
+      .topBar {
+        background-color: #444;
+        padding: 10px;
+        border-radius: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    
+      .topBar a {
+        color: #fff;
+        text-decoration: none;
+        margin: 0 10px;
+        transition: none;
+      }
+    
+      .topBar a:hover {
+        color: #ccc;
+        border-radius: 5px;
+        border: 1px solid #33CC33;
+        padding: 5px;
+        background-color: #444;
+        box-shadow: 0 0 10px #33CC33;
+      }
+    
+      #view-profile-link {
+        margin-left: 20px;
+      }
+
+      @media only screen and (max-width: 768px) {
+          .topBar {
+            flex-direction: column;
+          }
+          .topBar a {
+            margin: 10px 0;
+          }
+        }
+
+      #edit-vehicle-form {
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        box-shadow: 0 0 10px #ccc;
+      }
+
+      #edit-vehicle-form label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+
+      #edit-vehicle-form input[type="text"], #edit-vehicle-form input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin: 0 0 20px -10px;
+        border: 1px solid #ccc;
+      }
+
+      #edit-vehicle-form input[type="submit"] {
+        background-color: #4CAF50;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      #edit-vehicle-form input[type="submit"]:hover {
+        background-color: #3e8e41;
+      }
+    </style>
+</head>
+<body>
+    <div id="header"></div>
+    <script>
+      fetch('/adminHeader')
+          .then(response => response.text())
+          .then(html => {
+            document.getElementById('header').innerHTML = html;
+            })
+            .catch(error => {
+            console.error('Error fetching header:', error);
+            });
+    </script>
+    <form id="edit-vehicle-form">
+        <input type="hidden" id="vehicle-id" value="<%= vehicle[0].id %>" />
+        <label for="vehicleType">Vehicle Type:</label>
+        <input type="text" id="vehicleType" name="vehicleType" value="<%= vehicle[0].type %>" title="Enter the vehicle type" /><br><br>
+        <label for="make">Make:</label>
+        <input type="text" id="make" name="make" value="<%= vehicle[0].make %>" title="Enter the vehicle make" /><br><br>
+        <label for="model">Model:</label>
+        <input type="text" id="model" name="model" value="<%= vehicle[0].model %>" title="Enter the vehicle model" /><br><br>
+        <label for="year">Year:</label>
+        <input type="number" id="year" name="year" value="<%= vehicle[0].year %>" title="Enter the vehicle year" /><br><br>
+        <label for="license_plate_number">License Plate Number:</label>
+        <input type="text" id="license_plate_number" name="license_plate_number" value="<%= vehicle[0].license_plate_number %>" title="Enter the license plate number" /><br><br>
+        <label for="vin">VIN:</label>
+        <input type="text" id="vin" name="vin" value="<%= vehicle[0].vin %>" title="Enter the VIN number" /><br><br>
+        <label for="pricePerDay">Price for Rent:</label>
+        <input type="number" id="pricePerDay" name="pricePerDay" value="<%= vehicle[0].pricePerDay %>" title="Enter the price per day" placeholder="Enter the price per day" /><br><br>
+        <input type="submit" value="Update Vehicle">
+      </form>
+  
+  <script>
+    const form = document.getElementById('edit-vehicle-form');
+    const vehicleId = document.getElementById('vehicle-id').value;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const vehicleData = {
+        type: document.getElementById('vehicleType').value,
+        make: document.getElementById('make').value,
+        model: document.getElementById('model').value,
+        year: parseInt(document.getElementById('year').value),
+        license_plate_number: document.getElementById('license_plate_number').value,
+        vin: document.getElementById('vin').value,
+        pricePerDay: parseInt(document.getElementById('pricePerDay').value)
+      };
+      try {
+        const response = await fetch(`/api/vehicles/${vehicleId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(vehicleData)
+        });
+        if (response.ok) {
+          alert("Vehicle updated successfully!");
+          window.location.href = '/viewVehicles';
+        } else {
+          console.error('Error updating vehicle!:', response.status);
+        }
+      } catch (error) {
+        console.error('Error updating vehicle:', error);
+      }
+    });
+  </script>
+</body>
+</html>

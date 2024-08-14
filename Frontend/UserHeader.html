@@ -1,0 +1,20 @@
+<header>
+  <nav>
+    <div class="menu">
+      <div class="menu-next">
+      <div class="topBar" align="center">
+        <a href="/userhome">Home</a>
+        <a href="/logout">Log-out</a>
+        <a href="/bookVehicle">Book a Vehicle</a>
+        <a href="/resHist">Reservation History</a>
+        <a id="view-profile-link" href="/edit/users">View Profile</a>
+      </div>
+    </div>
+    </div>
+  </nav>
+  <script>
+    const userId = sessionStorage.getItem('userId');
+    const link = document.getElementById('view-profile-link');
+    link.href = `/edit/users`;
+  </script>
+</header>

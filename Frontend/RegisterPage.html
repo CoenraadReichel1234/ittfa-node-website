@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+<head>
+
+<title>Sign-Up</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="UTF-8">
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-image: url('/pictures/LoginRegisterBackground.jpeg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .container {
+    background-color: #fff;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 50%;
+  }
+
+  .header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    margin-top: 120px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+    margin-right: 20px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+
+  input[type="text"], input[type="number"], input[type="password"], input[type="email"] {
+    width: 100%;
+    height: 40px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  button[type="submit"] {
+    width: 100%;
+    height: 40px;
+    background-color: #4CAF50;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  button[type="submit"]:hover {
+    background-color: #3e8e41;
+  }
+
+  .login-link {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .login-link a {
+    text-decoration: none;
+    color: #337ab7;
+  }
+
+  .login-link a:hover {
+    color: #31d125;
+  }
+
+  .contact-info {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .contact-info a {
+    text-decoration: none;
+    color: #337ab7;
+  }
+
+  .contact-info a:hover {
+    color: #31d125;
+  }
+
+  @media (max-width: 768px) {
+    .container {
+        width: 90%;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        width: 95%;
+    }
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>CarFleeter</h1>
+    </div>
+    <h2>Register an Account</h2>
+    <form>
+      <input type="hidden" id="isAdmin" name="isAdmin" value="0">
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+      </div>
+      <div class="form-group">
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" name="first_name">
+      </div>
+      <div class="form-group">
+        <label for="surname">Surname:</label>
+        <input type="text" id="last_name" name="last_name">
+      </div>
+      <div class="form-group">
+        <label for="contact_no">Contact Number:</label>
+        <input type="number" id="phone_number" name="phone_number">
+      </div>
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password">
+      </div>
+      <div class="form-group">
+        <label for="Rep_PassWord">Repeat Password:</label>
+        <input type="password" id="Rep_PassWord" name="Rep_PassWord">
+      </div>
+      <button type="submit">Submit</button>
+    </form>
+    <div class="login-link">
+      <a href="/login">Already have an account?</a>
+    </div>
+    <div class="contact-info">
+      <p>Contact me if you need a password reset: <a href="mailto:coeniereichel@gmail.com">coeniereichel@gmail.com</a></p>
+      <p>Tel No: 073 716 6381</p>
+    </div>
+  </div>
+<script>
+  const registerForm = document.querySelector('form');
+  const emailInput = document.getElementById('email');
+  const firstNameInput = document.getElementById('first_name');
+  const lastNameInput = document.getElementById('last_name');
+  const contactNoInput = document.getElementById('phone_number');
+  const passwordInput = document.getElementById('password');
+  const repeatPasswordInput = document.getElementById('Rep_PassWord');
+  const isAdminInput = document.getElementById('isAdmin');
+  
+  registerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+      const first_name = firstNameInput.value.trim();
+      const last_name = lastNameInput.value.trim();
+      const phone_number = contactNoInput.value.trim();
+      const password = passwordInput.value.trim();
+      const repeatPassword = repeatPasswordInput.value.trim();
+      const isAdmin = isAdminInput.value.trim();
+  
+      if (email && first_name && last_name && phone_number && password && repeatPassword && isAdmin) {
+          if (password === repeatPassword) {
+              try {
+                  const response = await fetch('/api/users/register', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                          email,
+                          first_name,
+                          last_name,
+                          phone_number,
+                          password,
+                          isAdmin
+                      }),
+                  });
+  
+                  const data = await response.json();
+                  if (data.success) {
+                      //console.log(data.message);
+                      alert("User Successfully Registered!!");
+                      window.location.href = '/login';
+                  } else {
+                      console.error(data.message);
+                  }
+              } catch (error) {
+                  console.error('Error submitting form:', error);
+              }
+          } else {
+              console.error('Passwords do not match');
+          }
+      } else {
+          console.error('Please fill in all fields');
+      }
+  });
+  
+</script>
+
+</body>
+</html>

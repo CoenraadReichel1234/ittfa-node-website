@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Payment History</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      body {
+        background-image: url('./pictures/AdminHome.jpg');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+      
+      header {
+        background-color: #333;
+        padding: 20px;
+        text-align: center;
+      }
+      
+      nav {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      
+      .menu {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .menu-next {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 10px;
+      }
+      
+      .topBar {
+        background-color: #444;
+        padding: 10px;
+        border-radius: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .topBar a {
+        color: #fff;
+        text-decoration: none;
+        margin: 0 10px;
+        transition: none;
+      }
+      
+      .topBar a:hover {
+        color: #ccc;
+        border-radius: 5px;
+        border: 1px solid #33CC33;
+        padding: 5px;
+        background-color: #444;
+        box-shadow: 0 0 10px #33CC33;
+      }
+      
+      #view-profile-link {
+        margin-left: 20px;
+      }
+      
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 50px;
+      }
+      
+      th, td {
+        padding: 15px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+      
+      th {
+        background-color: #ead837;
+        color: black;
+      }
+      
+      tr {
+        background-color: #f2f2f2;
+      }
+      
+      tr:hover {
+        background-color: #cb5f25;
+      }
+      
+      button {
+        background-color: #FF0000;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      
+      
+      
+      @media only screen and (max-width: 768px) {
+        .topBar {
+          flex-direction: column;
+        }
+        .topBar a {
+          margin: 10px 0;
+        }
+      }
+    </style>
+</head>
+<body>
+    <div id="header"></div>
+    <script>
+      fetch('/adminHeader')
+          .then(response => response.text())
+          .then(html => {
+          document.getElementById('header').innerHTML = html;
+          })
+          .catch(error => {
+          console.error('Error fetching header:', error);
+          });
+    </script>
+    
+    <table border="1" id="payments-table">
+      <tr>
+        <th>User ID</th>
+        <th>User Email</th>
+        <th>Reservation ID</th>
+        <th>Vehicle ID</th>
+        <th>Vehicle Make</th>
+        <th>Vehicle Model</th>
+        <th>Price Per Day</th>
+        <th>Total Days</th>
+        <th>Total Rent Due</th>
+        <th>Payment Method</th>
+        <th>Reference Code</th>
+        <th>Payment History</th>
+        
+      </tr>
+    </table>
+
+    <script>
+        fetch('/api/payments/viewAdminPayHist')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Error fetching payments');
+    }
+    return response.json();
+  })
+  .then(payments => {
+    if (!payments) {
+      console.error('No payments found');
+      return;
+    }
+    const tableBody = document.getElementById('payments-table').getElementsByTagName('tbody')[0] || document.getElementById('payments-table');
+    payments.forEach(payment => {
+      const row = tableBody.insertRow();
+      
+
+      row.innerHTML = `
+        <td>${payment.user_id}</td>
+        <td>${payment.email}</td>
+        <td>${payment.reservation_id}</td>
+        <td>${payment.vehicle_id}</td>
+        <td>${payment.make}</td>
+        <td>${payment.model}</td>
+        <td>R ${payment.pricePerDay}</td>
+        <td>${payment.total_days}</td>
+        <td>R ${payment.total_rent_due}</td>
+        <td>${payment.payment_method == '1' ? 'EFT' : 'In Store'}</td>
+        <td>${payment.reference_code}</td>
+        <td><button class="update-payment-history" data-payment-id="${payment.id}">${payment.payment_history === 0 ? 'Pending' : payment.payment_history === 1 ? 'Paid' : 'Refund'}</button></td>
+      `;
+    });
+    
+    document.querySelectorAll('.update-payment-history').forEach(button => {
+      button.addEventListener('click', async () => {
+        const paymentId = button.dataset.paymentId;
+        let paymentStatus;
+        if (button.textContent === 'Pending') {
+          paymentStatus = 1;
+        } else if (button.textContent === 'Paid') {
+          paymentStatus = 2;
+        } else {
+          paymentStatus = 0;
+        }
+        try {
+          const response = await fetch('/api/payments/updatePaymentStatus', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ paymentId, paymentStatus }),
+          });
+          if (response.ok) {
+            button.textContent = paymentStatus === 0 ? 'Pending' : paymentStatus === 1 ? 'Paid' : 'Refund';
+          } else {
+            console.error('Error updating payment status:', response.status);
+          }
+        } catch (error) {
+          console.error('Error updating payment status:', error);
+        }
+      });
+    });
+    document.querySelectorAll('.update-payment-history').forEach(button => {
+      button.addEventListener('mousedown', () => {
+        if (button.textContent === 'Pending') {
+          button.style.backgroundColor = '#0069d9';
+        } else if (button.textContent === 'Paid') {
+          button.style.backgroundColor = '#2e865f';
+        } else {
+          button.style.backgroundColor = '#cc0000';
+        }
+      });
+    
+      button.addEventListener('mouseup', () => {
+        if (button.textContent === 'Pending') {
+          button.style.backgroundColor = '#007bff';
+        } else if (button.textContent === 'Paid') {
+          button.style.backgroundColor = '#33CC33';
+        } else {
+          button.style.backgroundColor = '#FF0000';
+        }
+      });
+      
+    });
+  })
+  .catch(error => {
+    console.error('Error fetching payments:', error);
+  });
+
+  
+    </script>
+</body>
+</html>

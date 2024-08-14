@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Vehicle Stock</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+      body {
+        background-image: url('./pictures/AdminHome.jpg');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, sans-serif;
+      }
+      header {
+        background-color: #333;
+        padding: 20px;
+        text-align: center;
+      }
+      
+      nav {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      
+      .menu {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .menu-next {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 10px;
+      }
+      
+      .topBar {
+        background-color: #444;
+        padding: 10px;
+        border-radius: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .topBar a {
+        color: #fff;
+        text-decoration: none;
+        margin: 0 10px;
+        transition: none;
+      }
+      
+      .topBar a:hover {
+        color: #ccc;
+        border-radius: 5px;
+        border: 1px solid #33CC33;
+        padding: 5px;
+        background-color: #444;
+        box-shadow: 0 0 10px #33CC33;
+      }
+      
+      #view-profile-link {
+        margin-left: 20px;
+      }
+      
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 50px;
+      }
+      
+      th, td {
+        padding: 15px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+      
+      th {
+        background-color: #4CAF50;
+        color: white;
+      }
+      
+      tr {
+        background-color: #f2f2f2;
+      }
+      
+      tr:hover {
+        background-color: #1081a7;
+        color: white;
+      }
+    
+      .actions a {
+        background-color: #007bff;
+        color: #fff;
+        padding: 5px 10px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+      }
+      
+      .actions a:hover {
+        background-color: #0056b3;
+      }
+      
+      button {
+        background-color: #007bff;
+        border: none;
+        color: white;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+      }
+      
+      button:hover {
+        background-color: #0056b3;
+      }
+      
+      @media only screen and (max-width: 768px) {
+        .topBar {
+          flex-direction: column;
+        }
+        .topBar a {
+          margin: 10px 0;
+        }
+      }
+    </style>
+    
+</head>
+<body>
+    <div id="header"></div>
+    <script>
+      fetch('/adminHeader')
+          .then(response => response.text())
+          .then(html => {
+          document.getElementById('header').innerHTML = html;
+          })
+          .catch(error => {
+          console.error('Error fetching header:', error);
+          });
+    </script>
+    
+    <table border="1" id="vehicle-table">
+      <tr>
+        <th>Type</th>
+        <th>Make</th>
+        <th>Model</th>
+        <th>Year</th>
+        <th>License Plate Number</th>
+        <th>VIN</th>
+        <th>Price Per Day</th>
+        <th>Actions</th>
+      </tr>
+    </table>
+
+    <script>
+        fetch('/api/viewVehicles')
+        .then(response => response.json())
+        .then(vehicles => {
+          const tableBody = document.getElementById('vehicle-table').getElementsByTagName('tbody')[0];
+          vehicles.forEach(vehicle => {
+            const row = tableBody.insertRow();
+            row.innerHTML = `
+              <td>${vehicle.type}</td>
+              <td>${vehicle.make}</td>
+              <td>${vehicle.model}</td>
+              <td>${vehicle.year}</td>
+              <td>${vehicle.license_plate_number}</td>
+              <td>${vehicle.vin}</td>
+              <td>${vehicle.pricePerDay}</td>
+              <td class = "actions"><a href="/editVehicle?id=${vehicle.id}">Edit</a> | <button onclick="deleteVehicle(${vehicle.id})">Delete</button></td>
+            `;
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching vehicles:', error);
+        });
+    </script>
+    <script>
+      function deleteVehicle(id) {
+        fetch(`/api/vehicles/${id}`, {
+          method: 'DELETE'
+        })
+        .then(response => response.text())
+        .then(message => {
+          //console.log(message);
+          alert("Vehicle Deleted Successfully!!");
+          location.reload();
+        })
+        .catch(error => {
+          console.error('Error deleting vehicle:', error);
+        });
+      }
+    </script>
+</body>
+</html>

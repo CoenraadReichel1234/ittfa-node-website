@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fleet Manager</title>
+  <style>
+    body{
+      background-image: url('./pictures/UserHome.jpg');
+    }
+    header {
+      background-color: #333;
+      padding: 20px;
+      text-align: center;
+    }
+  
+    nav {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  
+    .menu {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  
+    .menu-next {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      padding: 10px;
+    }
+  
+    .topBar {
+      background-color: #444;
+      padding: 10px;
+      border-radius: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  
+    .topBar a {
+      color: #fff;
+      text-decoration: none;
+      margin: 0 10px;
+      transition: none;
+    }
+  
+    .topBar a:hover {
+      color: #ccc;
+      border-radius: 5px;
+      border: 1px solid #33CC33;
+      padding: 5px;
+      background-color: #444;
+      box-shadow: 0 0 10px #33CC33;
+    }
+  
+    #view-profile-link {
+      margin-left: 20px;
+    }
+
+    @media only screen and (max-width: 768px) {
+      .topBar {
+        flex-direction: column;
+      }
+      .topBar a {
+        margin: 10px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="header"></div>
+  <script>
+    fetch('/userHeader')
+        .then(response => response.text())
+        .then(html => {
+        document.getElementById('header').innerHTML = html;
+        })
+        .catch(error => {
+        console.error('Error fetching header:', error);
+        });
+  </script>
+
+</body>
+</html>

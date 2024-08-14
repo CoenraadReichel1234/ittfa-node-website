@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicles</title>
+
+    <style>
+        body {
+          background-image: url('./pictures/AdminHome.jpg');
+          background-repeat: no-repeat;
+          background-size: cover;
+          background-position: center;
+          height: 100vh;
+          margin: 0;
+          font-family: Arial, sans-serif;
+        }
+        
+        header {
+          background-color: #333;
+          padding: 20px;
+          text-align: center;
+        }
+        
+        nav {
+          display: flex;
+          justify-content: center;
+          flex-wrap: wrap;
+        }
+        
+        .menu {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+        
+        .menu-next {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          padding: 10px;
+        }
+        
+        .topBar {
+          background-color: #444;
+          padding: 10px;
+          border-radius: 10px;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+        }
+        
+        .topBar a {
+          color: #fff;
+          text-decoration: none;
+          margin: 0 10px;
+          transition: none;
+        }
+        
+        .topBar a:hover {
+          color: #ccc;
+          border-radius: 5px;
+          border: 1px solid #33CC33;
+          padding: 5px;
+          background-color: #444;
+          box-shadow: 0 0 10px #33CC33;
+        }
+        
+        #view-profile-link {
+          margin-left: 20px;
+        }
+        
+        form {
+          max-width: 500px;
+          margin: 40px auto;
+          padding: 20px;
+          background-color: #f9f9f9;
+          border: 1px solid #ccc;
+          box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        label {
+          display: block;
+          margin-bottom: 10px;
+          font-weight: bold;
+        }
+        
+        input[type="text"], input[type="number"] {
+          width: 100%;
+          padding: 10px;
+          margin:0 0 20px -10px;
+          border: 1px solid #ccc;
+        }
+        
+        input[type="submit"] {
+          background-color: #4CAF50;
+          color: #fff;
+          padding: 10px 20px;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+        }
+        
+        input[type="submit"]:hover {
+          background-color: #3e8e41;
+        }
+        
+        @media only screen and (max-width: 768px) {
+          .topBar {
+            flex-direction: column;
+          }
+          .topBar a {
+            margin: 10px 0;
+          }
+        }
+      </style>
+</head>
+<body>
+    <div id="header"></div>
+    <script>
+      fetch('/adminHeader')
+          .then(response => response.text())
+          .then(html => {
+            document.getElementById('header').innerHTML = html;
+            })
+            .catch(error => {
+            console.error('Error fetching header:', error);
+            });
+    </script>
+ <form>
+  <label for="type">Vehicle Type:</label>
+  <input type="text" id="vehicleType" name="vehicleType"><br><br>
+  <label for="make">Make:</label>
+  <input type="text" id="make" name="make"><br><br>
+  <label for="model">Model:</label>
+  <input type="text" id="model" name="model"><br><br>
+  <label for="year">Year:</label>
+  <input type="number" id="year" name="year"><br><br>
+  <label for="license_plate_number">License Plate Number:</label>
+  <input type="text" id="license_plate_number" name="license_plate_number"><br><br>
+  <label for="vin">VIN:</label>
+  <input type="text" id="vin" name="vin"><br><br>
+  <label for="price">Price to rent:</label>
+  <input type="number" id="pricePerDay" name="pricePerDay"><br><br>
+  <input type="submit" name="submit" value="Add Vehicle">
+</form>
+
+<script>
+    const addVehicleform = document.querySelector('form');
+    const typeInput = document.getElementById('vehicleType');
+    const makeInput = document.getElementById('make');
+    const modelInput = document.getElementById('model');
+    const yearInput = document.getElementById('year');
+    const plateInput = document.getElementById('license_plate_number');
+    const vinInput = document.getElementById('vin');
+    const priceInput = document.getElementById('pricePerDay');
+    
+    addVehicleform.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const type = typeInput.value.trim();
+        const make = makeInput.value.trim();
+        const model = modelInput.value.trim();
+        const year = yearInput.value.trim();
+        const license_plate_number = plateInput.value.trim();
+        const vin = vinInput.value.trim();
+        const pricePerDay = priceInput.value.trim();
+    
+        if (type && make && model && year && license_plate_number && vin && pricePerDay) {
+            
+                try {
+                    const response = await fetch('/api/addVehicle', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type,
+                            make,
+                            model,
+                            year,
+                            license_plate_number,
+                            vin,
+                            pricePerDay
+                        }),
+                    });
+                    
+                    const data = await response.json();
+                    if (data.success) {
+                        alert('Vehicle added successfully!');
+                        window.location.href = '/viewVehicles';
+                    } else {
+                        alert('Error adding vehicle: ' + data.message);
+                    }
+                } catch (error) {
+                    console.error('Error submitting form:', error);
+                }
+        } else {
+            console.error('Please fill in all fields');
+        }
+    });
+</script>
+</body>
+</html>

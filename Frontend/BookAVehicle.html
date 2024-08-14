@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Vehicle</title>
+    <style>
+      body{
+        background-image: url('./pictures/UserHome.jpg');
+      }
+      header {
+        background-color: #333;
+        padding: 20px;
+        text-align: center;
+      }
+    
+      nav {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+    
+      .menu {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    
+      .menu-next {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 10px;
+      }
+    
+      .topBar {
+        background-color: #444;
+        padding: 10px;
+        border-radius: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    
+      .topBar a {
+        color: #fff;
+        text-decoration: none;
+        margin: 0 10px;
+        transition: none;
+      }
+    
+      .topBar a:hover {
+        color: #ccc;
+        border-radius: 5px;
+        border: 1px solid #33CC33;
+        padding: 5px;
+        background-color: #444;
+        box-shadow: 0 0 10px #33CC33;
+      }
+    
+      #view-profile-link {
+        margin-left: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .heading-1 {
+        font-size: 36px;
+        font-weight: bold;
+        color: #333;
+        text-align: center;
+        margin: 20px;
+        padding: 10px 20px;
+        background-color: #f9f9f9;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+      }
+      
+      form {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 20px;
+        background-color: #f9f9f9;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      
+      label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: bold;
+      }
+      
+      input, textarea, select {
+        width: 100%;
+        padding: 10px;
+        margin:10px 0 20px -10px ;
+        border: 1px solid #ccc;
+        font-size: 18px;
+        height: 40px; 
+      }
+      
+      input[type="submit"] {
+        background-color: #4CAF50;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      
+      input[type="submit"]:hover {
+        background-color: #3e8e41;
+      }
+      
+      #search-results {
+        margin-top: 40px;
+      }
+      
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      
+      th, td {
+        border: 1px solid #ddd;
+        padding: 10px;
+        text-align: left;
+      }
+      
+      th {
+        background-color: #f0f0f0;
+      }
+      
+      tr {
+        background-color: #f9f9f9;
+      }
+      
+      button {
+        background-color: #4CAF50;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+      
+      button:hover {
+        background-color: #3e8e41;
+      }
+
+      .thankYouMessage {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        margin: 40px auto;
+        width: 80%;
+        text-align: center;
+      }
+      
+      .thankYouMessage h2 {
+        margin-top: 0;
+      }
+      
+      .thankYouMessage ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .thankYouMessage li {
+        margin-bottom: 10px;
+      }
+      
+      .thankYouMessage p {
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+
+      .paymentDetails {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        margin: 40px auto;
+        width: 80%;
+        text-align: center;
+      }
+
+      .paymentDetails ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+      
+      .paymentDetails li {
+        margin-bottom: 10px;
+      }
+      
+      .paymentDetails p {
+        margin-bottom: 20px;
+        font-weight: bold;
+      }
+  
+      @media only screen and (max-width: 768px) {
+        .topBar {
+          flex-direction: column;
+        }
+        .topBar a {
+          margin: 10px 0;
+        }
+      }
+    </style>
+</head>
+<body>
+    <div id="header"></div>
+  <script>
+    fetch('/userHeader')
+        .then(response => response.text())
+        .then(html => {
+        document.getElementById('header').innerHTML = html;
+        })
+        .catch(error => {
+        console.error('Error fetching header:', error);
+        });
+  </script>
+  <div class="heading-1">
+    <h1>Search Vehicle</h1>
+  </div>
+  
+    <form id="search-form">
+        <label for="type">Vehicle Type:</label>
+        <input type="text" id="vehicleType" name="vehicleType"><br><br>
+
+        <label for="make">Make:</label>
+        <input type="text" id="make" name="make"><br><br>
+
+        <label for="model">Model:</label>
+        <input type="text" id="model" name="model"><br><br>
+
+        <label for="year">Year:</label>
+        <input type="number" id="year" name="year"><br><br>
+
+        <label for="price">Price per Day:</label>
+        <input type="number" id="pricePerDay" name="pricePerDay"><br><br>
+
+        <label for="Form-info">Please fill in the below fields</label><br><br>
+        <label for="rental_period">Rental Period Start Date:</label>
+        <input type="date" id="rental_period_start" name="rental_period_start" required><br><br>
+
+        <label for="rental_period">Rental Period End Date:</label>
+        <input type="date" id="rental_period_end" name="rental_period_end" required><br><br>
+
+        <label for="additional_services">Additional Services:</label>
+        <textarea id="additional_services" name="additional_services" rows="10" cols="40"></textarea><br><br>
+
+        <label for="payment_method">Payment Method:</label>
+        <select id="payment_method" name="payment_method" required>
+          <option value="">Select an Option</option>
+          <option value="1">EFT</option>
+          <option value="0">In Store</option>
+        </select><br><br>
+        <input type="submit" name="submit" value="Search">
+    </form>
+    
+    <div id="search-results"></div>
+
+    <script>
+      
+      const form = document.getElementById('search-form');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const searchParams = {};
+        formData.forEach((value, key) => {
+          searchParams[key] = value;
+        });
+        try {
+          fetch('/api/searchVehicles', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(searchParams),
+          })
+          .then(response => response.json())
+          .then((vehicles) => {
+            if (!Array.isArray(vehicles)) {
+              console.error('Error searching for vehicles:', vehicles);
+              return;
+            }
+    
+            const searchResultsHTML = `
+              <table>
+                <thead>
+                  <tr>
+                    
+                    <th>Vehicle Type</th>
+                    <th>Make</th>
+                    <th>Model</th>
+                    <th>Year</th>
+                    <th>Price per Day</th>
+                    <th>Rental Period Start</th>
+                    <th>Rental Period End</th>
+                    <th>Additional Services</th>
+                    <th>Payment Method</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${vehicles.map((vehicle, index) => {
+                    return `
+                      <tr>
+                        <td>${vehicle.type}</td>
+                        <td>${vehicle.make}</td>
+                        <td>${vehicle.model}</td>
+                        <td>${vehicle.year}</td>
+                        <td>R ${vehicle.pricePerDay}</td>
+                        <td>${searchParams.rental_period_start}</td>
+                        <td>${searchParams.rental_period_end}</td>
+                        <td>${searchParams.additional_services}</td>
+                        <td>${searchParams.payment_method}</td>
+                        <td>
+                          <button onclick="bookVehicleFunc(${index}, '${vehicle.id}', '${searchParams.rental_period_start}', '${searchParams.rental_period_end}', '${searchParams.additional_services}', ${vehicle.pricePerDay},'${searchParams.payment_method}')">Book</button>
+                        </td>
+                      </tr>
+                    `;
+                  }).join('')}
+                </tbody>
+              </table>
+            `;
+            document.getElementById('search-results').innerHTML = searchResultsHTML;
+          })
+          .catch((error) => {
+            console.error('Error searching for vehicles:', error);
+          });
+        } catch (error) {
+          console.error('Error searching for vehicles:', error);
+        }
+      });
+    
+      function bookVehicleFunc(index, vehicleId, rentalPeriodStart, rentalPeriodEnd, additionalServices, pricePerDay,payment_method) {
+        bookVehicle(index, vehicleId, rentalPeriodStart, rentalPeriodEnd, additionalServices, pricePerDay, payment_method);
+      }
+
+      async function bookVehicle(index, vehicleId, rentalPeriodStart, rentalPeriodEnd, additionalServices, pricePerDay, payment_method) {
+        try {
+          const userId = localStorage.getItem('userId');
+      
+          if (!userId) {
+            console.error('userId is not set');
+            return;
+          }
+          const response = await fetch('/api/reservations/createReservation', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              userId,
+              vehicleId,
+              rentalPeriodStart,
+              rentalPeriodEnd,
+              additionalServices,
+              pricePerDay,
+              payment_method,
+            }),
+          });
+          const result = await response.json();
+          if (result.success) {
+            let thankYouMessage = `
+            <div class="thankYouMessage">
+              <h2>Thank you for your reservation!</h2>
+              <p>Reservation details:</p>
+              <ul>
+                <li>Vehicle ID: ${vehicleId}</li>
+                <li>Rental Period Start: ${rentalPeriodStart}</li>
+                <li>Rental Period End: ${rentalPeriodEnd}</li>
+                <li>Additional Services: ${additionalServices}</li>
+                <li>Price per Day: R ${pricePerDay}</li>
+                <li>Payment Method: ${payment_method === '1' ? 'EFT' : 'In Store'}</li>
+                <li>Reference Code: ${result.referenceCode}</li>
+              </ul>
+            </div>
+            `;
+            if (payment_method === '1') {
+              thankYouMessage += `
+              <div class="paymentDetails">
+                <p>Please make payment to the following bank account:</p>
+                <p>Use Reference Code upon Payment</p>
+                <ul>
+                  <li>Bank Name: Car-Bank</li>
+                  <li>Account Holder: Road Fleet</li>
+                  <li>Account Number: 1234567890</li>
+                </ul>
+              </div>
+              `;
+            }
+            document.getElementById('search-results').innerHTML = thankYouMessage;
+          } else {
+            console.error('Error creating reservation:', result.error);
+          }
+        } catch (error) {
+          console.error('Error creating reservation:', error);
+        }
+      }
+    </script>
+
+</body>
+</html>
