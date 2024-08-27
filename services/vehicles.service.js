@@ -33,29 +33,38 @@ module.exports.deleteVehicle = async (id) => {
 
 
 module.exports.searchVehicles = async (searchParams) => {
-  let { vehicleType, make, model, year, pricePerDay } = searchParams;
-  let query = `SELECT * FROM vehicles WHERE `;
+  let { vehicleType, make, model, year, pricePerDay, rental_period_start, rental_period_end } = searchParams;
+  let query = `SELECT v.* FROM vehicles v LEFT JOIN reservations r ON v.id = r.vehicle_id WHERE `;
   let params = [];
+  let orConditions = [];
   if (vehicleType) {
-    query += `type = ? OR `;
+    orConditions.push(`v.type = ?`);
     params.push(vehicleType);
   }
   if (make) {
-    query += `make = ? OR `;
+    orConditions.push(`v.make = ?`);
     params.push(make);
   }
   if (model) {
-    query += `model = ? OR `;
+    orConditions.push(`v.model = ?`);
     params.push(model);
   }
   if (year) {
-    query += `year = ? OR `;
+    orConditions.push(`v.year = ?`);
     params.push(year);
   }
   if (pricePerDay) {
-    query += `pricePerDay = ? OR `;
+    orConditions.push(`v.pricePerDay = ?`);
     params.push(pricePerDay);
   }
+
+  if (orConditions.length > 0) {
+    query += `(${orConditions.join(' OR ')}) AND `;
+  }
+
+  query += `(r.vehicle_id IS NULL OR r.rental_period_end < ? OR r.rental_period_start > ?) `;
+  params.push(rental_period_start);
+  params.push(rental_period_end);
   query = query.replace(/OR\s*$/, '');
   const [records] = await db.query(query, params);
   return records;
