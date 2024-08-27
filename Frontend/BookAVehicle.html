@@ -323,7 +323,7 @@
                         <td>${searchParams.rental_period_start}</td>
                         <td>${searchParams.rental_period_end}</td>
                         <td>${searchParams.additional_services}</td>
-                        <td>${searchParams.payment_method}</td>
+                        <td>${searchParams.payment_method=== '1' ? 'EFT' : 'In Store'}</td>
                         <td>
                           <button onclick="bookVehicleFunc(${index}, '${vehicle.id}', '${searchParams.rental_period_start}', '${searchParams.rental_period_end}', '${searchParams.additional_services}', ${vehicle.pricePerDay},'${searchParams.payment_method}')">Book</button>
                         </td>
