@@ -2,10 +2,10 @@ const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
 
 const sessionStore = new MySQLStore({
-  host: process.env.MYSQLHOST,
-    user: process.env.MYSQLUSER,
-    password: process.env.MYSQLPASSWORD,
-    database: process.env.MYSQLDATABASE,
+  host: 'localhost',
+  user: 'root',
+  password: 'Coenraad71$',
+  database: 'fleetmanager',
 });
 
 const sessionConfig = {
