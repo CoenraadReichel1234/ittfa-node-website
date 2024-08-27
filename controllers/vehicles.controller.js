@@ -31,8 +31,8 @@ router.delete('/vehicles/:id', async (req, res) => {
 });
 
 router.post('/searchVehicles', async (req, res) => {
-  const { vehicleType, make, model, year, pricePerDay } = req.body;
-  const vehicles = await service.searchVehicles({ vehicleType, make, model, year, pricePerDay });
+  const { vehicleType, make, model, year, pricePerDay, rental_period_start, rental_period_end } = req.body;
+  const vehicles = await service.searchVehicles({ vehicleType, make, model, year, pricePerDay, rental_period_start, rental_period_end });
   if (vehicles.length === 0) {
     res.status(404).json({ message: 'No vehicles found' });
   } else {
